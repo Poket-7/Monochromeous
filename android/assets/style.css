@@ -1,0 +1,717 @@
+/* ==========================================================================
+   THE ENTITY // MONOCHROME SURVIVAL HORROR
+   Strict Monochrome Retro Pixelated Aesthetic
+   ========================================================================== */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  font-family: 'Courier New', Courier, monospace, monospace;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #000000;
+  color: #ffffff;
+  touch-action: none;
+}
+
+button, .menu-btn, .action-btn, .hud-btn {
+  touch-action: manipulation !important;
+  cursor: pointer;
+  pointer-events: auto !important;
+  -webkit-tap-highlight-color: rgba(255, 255, 255, 0.3);
+}
+
+/* --------------------------------------------------------------------------
+   Canvas & Viewport (Low-Res Pixelated Rendering)
+   -------------------------------------------------------------------------- */
+#game-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #000000;
+}
+
+#game-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-crisp-edges;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+/* CRT Scanlines Overlay */
+#crt-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.25) 0px,
+    rgba(0, 0, 0, 0.25) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  z-index: 10;
+  opacity: 0.85;
+}
+
+/* Horror Vignette Overlay */
+#vignette-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.8) 85%, #000000 100%);
+  z-index: 11;
+}
+
+/* Horror Glitch Static Overlay */
+#static-glitch-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 12;
+  opacity: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.15) 0px,
+    rgba(0, 0, 0, 0.9) 2px,
+    rgba(255, 255, 255, 0.3) 4px,
+    rgba(0, 0, 0, 0.8) 6px
+  );
+  transition: opacity 0.1s ease;
+}
+
+#static-glitch-overlay.intense {
+  opacity: 0.75;
+  animation: staticFlicker 0.08s steps(2) infinite;
+}
+
+@keyframes staticFlicker {
+  0% { transform: translate(1px, -2px) scale(1.01); }
+  50% { transform: translate(-2px, 1px) scale(0.99); }
+  100% { transform: translate(2px, 2px) scale(1.02); }
+}
+
+/* --------------------------------------------------------------------------
+   In-Game HUD
+   -------------------------------------------------------------------------- */
+.overlay-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 20;
+}
+
+.hud-top {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid #ffffff;
+  padding: 10px 16px;
+}
+
+.hud-objective {
+  font-size: 15px;
+  font-weight: bold;
+  letter-spacing: 2px;
+  display: flex;
+  gap: 6px;
+}
+
+.hud-label {
+  color: #aaaaaa;
+}
+
+.hud-battery, .hud-stamina {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  letter-spacing: 1px;
+}
+
+.bar-container {
+  width: 90px;
+  height: 10px;
+  border: 1px solid #ffffff;
+  background: #111111;
+  position: relative;
+}
+
+#battery-bar, #stamina-bar {
+  height: 100%;
+  background: #ffffff;
+  transition: width 0.15s ease-out;
+}
+
+.hud-btn {
+  pointer-events: auto;
+  margin-left: auto;
+  background: #000000;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 4px 14px;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.1s ease;
+}
+
+.hud-btn:hover, .hud-btn:active {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* Threat Proximity Alert */
+#threat-indicator {
+  position: absolute;
+  top: 75px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.85);
+  border: 1px solid #ffffff;
+  padding: 8px 18px;
+  animation: pulseGlow 0.6s infinite alternate;
+}
+
+.threat-text {
+  font-size: 14px;
+  letter-spacing: 2px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.threat-pulse {
+  width: 10px;
+  height: 10px;
+  background: #ffffff;
+  border-radius: 50%;
+  animation: heartbeatBlink 0.5s infinite;
+}
+
+@keyframes pulseGlow {
+  0% { border-color: #555555; background: rgba(0, 0, 0, 0.85); }
+  100% { border-color: #ffffff; background: rgba(30, 30, 30, 0.95); }
+}
+
+@keyframes heartbeatBlink {
+  0% { transform: scale(0.8); opacity: 0.3; }
+  50% { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.3; }
+}
+
+.interaction-prompt {
+  position: absolute;
+  bottom: 120px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #000000;
+  border: 1px solid #ffffff;
+  padding: 8px 20px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  animation: pulseGlow 0.8s infinite alternate;
+}
+
+/* --------------------------------------------------------------------------
+   Touch Controls: Left Visible Joystick + Right Look Zone
+   -------------------------------------------------------------------------- */
+#touch-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 25;
+}
+
+/* Left Joystick Zone */
+#joystick-zone {
+  position: absolute;
+  bottom: 35px;
+  left: 35px;
+  width: 140px;
+  height: 140px;
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+#joystick-base {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#joystick-base::after {
+  content: "";
+  width: 40px;
+  height: 40px;
+  border: 1px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  position: absolute;
+  pointer-events: none;
+}
+
+#joystick-knob {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid #000000;
+  box-shadow: 0 0 6px #ffffff;
+  position: absolute;
+  transform: translate(0px, 0px);
+  pointer-events: none;
+  transition: transform 0.05s ease-out;
+}
+
+.joystick-hint {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #aaaaaa;
+  margin-top: 6px;
+  font-weight: bold;
+}
+
+/* Right Touch Drag Area (for Camera Rotation) */
+#look-zone {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 55vw;
+  height: 100vh;
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 40px;
+}
+
+.look-hint {
+  color: rgba(255, 255, 255, 0.25);
+  font-size: 12px;
+  letter-spacing: 3px;
+  pointer-events: none;
+  transform: rotate(90deg);
+}
+
+/* Action Buttons (Right Side) */
+#action-buttons {
+  position: absolute;
+  bottom: 35px;
+  right: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: auto;
+  z-index: 30;
+}
+
+.action-btn {
+  width: 74px;
+  height: 46px;
+  background: rgba(0, 0, 0, 0.75);
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 1px;
+  cursor: pointer;
+  outline: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.2);
+}
+
+.action-btn:active, .action-btn.active {
+  background: #ffffff;
+  color: #000000;
+}
+
+/* --------------------------------------------------------------------------
+   Menus & Modals
+   -------------------------------------------------------------------------- */
+.menu-screen, .modal-screen {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.92);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.menu-box, .modal-box {
+  width: 90%;
+  max-width: 440px;
+  max-height: 92vh;
+  overflow-y: auto;
+  background: #000000;
+  border: 2px solid #ffffff;
+  padding: 18px 24px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* Glitch Title */
+.glitch-title {
+  font-size: 26px;
+  letter-spacing: 5px;
+  color: #ffffff;
+  position: relative;
+  text-transform: uppercase;
+  font-weight: 900;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: #888888;
+  margin-top: -4px;
+}
+
+/* Required Dedication Banner */
+.special-thanks-banner {
+  border: 1px dashed #888888;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 7px 12px;
+  font-size: 11.5px;
+  font-style: italic;
+  letter-spacing: 0.5px;
+  color: #dddddd;
+  line-height: 1.35;
+}
+
+.menu-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.menu-btn {
+  background: #000000;
+  border: 2px solid #ffffff;
+  color: #ffffff;
+  padding: 9px 16px;
+  font-size: 12.5px;
+  font-weight: bold;
+  letter-spacing: 1.5px;
+  cursor: pointer;
+  outline: none;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+
+.menu-btn:hover, .menu-btn:active, .menu-btn:focus {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: 0 0 10px #ffffff;
+}
+
+.menu-btn.primary {
+  background: #ffffff;
+  color: #000000;
+}
+
+.menu-btn.primary:hover, .menu-btn.primary:active {
+  background: #000000;
+  color: #ffffff;
+  box-shadow: 0 0 12px #ffffff;
+}
+
+.footer-note {
+  font-size: 11px;
+  color: #666666;
+  letter-spacing: 1px;
+  margin-top: 8px;
+}
+
+/* Credits List */
+.credits-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 14px 0;
+  text-align: left;
+  border-top: 1px solid #444444;
+  border-bottom: 1px solid #444444;
+  padding: 16px 0;
+}
+
+.credit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  letter-spacing: 1.5px;
+}
+
+.credit-role {
+  color: #888888;
+  font-weight: bold;
+}
+
+.credit-name {
+  color: #ffffff;
+  font-weight: 900;
+  border-bottom: 1px solid #ffffff;
+  padding-bottom: 2px;
+}
+
+.credits-dedication {
+  font-size: 12px;
+  color: #aaaaaa;
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* Instructions Content */
+.instructions-content {
+  text-align: left;
+  font-size: 13px;
+  line-height: 1.6;
+  max-height: 60vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.controls-guide {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid #333333;
+  border-bottom: 1px solid #333333;
+  padding: 10px 0;
+}
+
+.controls-guide h3 {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  color: #ffffff;
+}
+
+.controls-guide ul {
+  padding-left: 20px;
+  font-size: 12px;
+  color: #cccccc;
+}
+
+.warning-text {
+  color: #ffffff;
+  font-weight: bold;
+  border-left: 3px solid #ffffff;
+  padding-left: 10px;
+}
+
+/* Game Over / Horror Box */
+.horror-box {
+  border-color: #ffffff;
+  background: #000000;
+  animation: glitchShake 0.4s infinite;
+}
+
+.blood-title {
+  font-size: 32px;
+  letter-spacing: 6px;
+  color: #ffffff;
+  text-shadow: 2px 2px #555555, -2px -2px #888888;
+}
+
+.horror-sub {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #888888;
+}
+
+@keyframes glitchShake {
+  0% { transform: translate(1px, 1px); }
+  25% { transform: translate(-2px, 0); }
+  50% { transform: translate(2px, -1px); }
+  75% { transform: translate(-1px, 2px); }
+  100% { transform: translate(1px, -1px); }
+}
+
+/* Victory Box */
+.victory-box {
+  border-color: #ffffff;
+  box-shadow: 0 0 30px #ffffff;
+}
+
+.victory-title {
+  font-size: 32px;
+  letter-spacing: 6px;
+}
+
+.victory-sub {
+  font-size: 13px;
+  letter-spacing: 3px;
+  color: #aaaaaa;
+}
+
+.victory-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  margin: 10px 0;
+  border: 1px dashed #ffffff;
+  padding: 12px;
+}
+
+/* Utility */
+.hidden {
+  display: none !important;
+}
+
+/* Responsive adjustments for mobile portrait and landscape */
+@media (max-width: 600px), (max-height: 520px) {
+  .menu-box, .modal-box {
+    padding: 12px 18px;
+    width: 94%;
+    max-width: 410px;
+    max-height: 94vh;
+    gap: 7px;
+  }
+
+  .glitch-title {
+    font-size: 20px;
+    letter-spacing: 3px;
+  }
+
+  .subtitle {
+    font-size: 10px;
+    letter-spacing: 2px;
+  }
+
+  .special-thanks-banner {
+    font-size: 10.5px;
+    padding: 5px 10px;
+    line-height: 1.3;
+  }
+
+  .menu-buttons {
+    gap: 6px;
+    margin-top: 2px;
+  }
+
+  .menu-btn {
+    padding: 7px 12px;
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .footer-note {
+    font-size: 9.5px;
+    margin-top: 4px;
+  }
+
+  .credits-list {
+    gap: 8px;
+    margin: 8px 0;
+    padding: 8px 0;
+  }
+
+  .credit-row {
+    font-size: 12px;
+  }
+
+  .instructions-content {
+    font-size: 11px;
+    gap: 8px;
+    max-height: 65vh;
+  }
+
+  .hud-top {
+    gap: 8px;
+    padding: 6px 10px;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+  }
+
+  .bar-container {
+    width: 55px;
+    height: 8px;
+  }
+
+  #joystick-zone {
+    bottom: 15px;
+    left: 15px;
+  }
+
+  #action-buttons {
+    bottom: 15px;
+    right: 12px;
+    gap: 8px;
+  }
+
+  .action-btn {
+    width: 66px;
+    height: 40px;
+    font-size: 11px;
+  }
+}

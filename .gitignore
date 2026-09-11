@@ -1,0 +1,8 @@
+# Android build outputs
+android/build/
+*.idsig
+debug.keystore
+
+# Operating system files
+.DS_Store
+Thumbs.db

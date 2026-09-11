@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>MONOCHROMEOUS // SURVIVAL HORROR</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Local Three.js with CDN fallback -->
+  <script src="js/three.min.js"></script>
+  <script>
+    if (typeof THREE === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+  <!-- Canvas Container for Low-Resolution Pixelated 3D Render -->
+  <div id="game-container">
+    <canvas id="game-canvas"></canvas>
+    <div id="crt-overlay"></div>
+    <div id="vignette-overlay"></div>
+    <div id="static-glitch-overlay"></div>
+  </div>
+
+  <!-- In-Game Heads-Up Display (HUD) -->
+  <div id="hud" class="overlay-screen hidden">
+    <div class="hud-top">
+      <div class="hud-objective">
+        <span class="hud-label">BEACONS:</span>
+        <span id="beacon-counter">0 / 4</span>
+      </div>
+      <div class="hud-battery">
+        <span class="hud-label">LIGHT:</span>
+        <div class="bar-container">
+          <div id="battery-bar" style="width: 100%;"></div>
+        </div>
+      </div>
+      <div class="hud-stamina">
+        <span class="hud-label">STAMINA:</span>
+        <div class="bar-container">
+          <div id="stamina-bar" style="width: 100%;"></div>
+        </div>
+      </div>
+      <button id="btn-pause" class="hud-btn" aria-label="Pause Game">❚❚</button>
+    </div>
+
+    <!-- Proximity Alert & Threat Detection -->
+    <div id="threat-indicator" class="hidden">
+      <div class="threat-pulse"></div>
+      <span class="threat-text">⚠ ENTITY DETECTED ⚠</span>
+    </div>
+
+    <div id="interaction-prompt" class="interaction-prompt hidden">
+      [TAP / PRESS E TO ACTIVATE BEACON]
+    </div>
+  </div>
+
+  <!-- Touch Controls (Mobile Friendly, Visible Joystick) -->
+  <div id="touch-controls" class="hidden">
+    <!-- Left Side: Always Visible Virtual Joystick -->
+    <div id="joystick-zone">
+      <div id="joystick-base">
+        <div id="joystick-knob"></div>
+      </div>
+      <div class="joystick-hint">MOVE</div>
+    </div>
+
+    <!-- Right Side: Look & Camera Rotation Touch Zone -->
+    <div id="look-zone">
+      <div class="look-hint">DRAG TO LOOK</div>
+    </div>
+
+    <!-- Action Buttons on Right -->
+    <div id="action-buttons">
+      <button id="btn-action-interact" class="action-btn hidden">INTERACT</button>
+      <button id="btn-action-flashlight" class="action-btn">LIGHT</button>
+      <button id="btn-action-sprint" class="action-btn">SPRINT</button>
+    </div>
+  </div>
+
+  <!-- Main Menu -->
+  <div id="main-menu" class="menu-screen active">
+    <div class="menu-box">
+      <h1 class="glitch-title" data-text="MONOCHROMEOUS">MONOCHROMEOUS</h1>
+      <p class="subtitle">SURVIVAL HORROR</p>
+      
+      <!-- Special thanks dedication as requested -->
+      <div class="special-thanks-banner">
+        "A special thanks to Tegh and Louis for making this possible"
+      </div>
+
+      <div class="menu-buttons">
+        <button id="btn-start" class="menu-btn primary">START SURVIVAL</button>
+        <button id="btn-instructions" class="menu-btn">HOW TO SURVIVE</button>
+        <button id="btn-credits" class="menu-btn">CREDITS</button>
+      </div>
+      
+      <div class="footer-note">Controls: Left Joystick to move • Right side to look • Keyboard WASD + Mouse</div>
+    </div>
+  </div>
+
+  <!-- Credits Modal -->
+  <div id="credits-modal" class="modal-screen hidden">
+    <div class="modal-box">
+      <h2>PROJECT CREDITS</h2>
+      <div class="credits-list">
+        <div class="credit-row">
+          <span class="credit-role">STORYBOARD</span>
+          <span class="credit-name">Tegh-storyboard</span>
+        </div>
+        <div class="credit-row">
+          <span class="credit-role">ART</span>
+          <span class="credit-name">Louis-art</span>
+        </div>
+        <div class="credit-row">
+          <span class="credit-role">CODING</span>
+          <span class="credit-name">Abdullah-coding</span>
+        </div>
+      </div>
+      <div class="credits-dedication">
+        Special thanks to Tegh and Louis for making this possible.
+      </div>
+      <button id="btn-close-credits" class="menu-btn">RETURN</button>
+    </div>
+  </div>
+
+  <!-- Instructions Modal -->
+  <div id="instructions-modal" class="modal-screen hidden">
+    <div class="modal-box">
+      <h2>SURVIVAL MANUAL</h2>
+      <div class="instructions-content">
+        <p><strong>OBJECTIVE:</strong> You are trapped in an abandoned labyrinth shrouded in thick fog. A horrifying Entity stalks the halls. Locate all <strong>4 Signal Beacons</strong> to open the Exit Blast Gate and escape.</p>
+        <div class="controls-guide">
+          <div>
+            <h3>TOUCH CONTROLS:</h3>
+            <ul>
+              <li><strong>Left Joystick:</strong> Visible joystick to walk & strafe</li>
+              <li><strong>Right Screen Area:</strong> Drag to rotate camera view</li>
+              <li><strong>LIGHT:</strong> Toggle Flashlight</li>
+              <li><strong>SPRINT:</strong> Hold to sprint</li>
+              <li><strong>Pause Button (❚❚):</strong> Top-right corner</li>
+            </ul>
+          </div>
+          <div>
+            <h3>DESKTOP CONTROLS:</h3>
+            <ul>
+              <li><strong>W, A, S, D / Arrows:</strong> Move & Strafe</li>
+              <li><strong>Mouse:</strong> Look around (Click to lock cursor)</li>
+              <li><strong>Shift:</strong> Sprint</li>
+              <li><strong>F:</strong> Toggle Flashlight</li>
+              <li><strong>E / Space:</strong> Interact with Beacons</li>
+              <li><strong>ESC / P:</strong> Pause</li>
+            </ul>
+          </div>
+        </div>
+        <p class="warning-text">⚠ The Entity hunts in the fog. Watch your proximity alert and listen for accelerating heartbeats.</p>
+      </div>
+      <button id="btn-close-instructions" class="menu-btn">RETURN</button>
+    </div>
+  </div>
+
+  <!-- Pause Menu -->
+  <div id="pause-menu" class="modal-screen hidden">
+    <div class="modal-box">
+      <h2>PAUSED</h2>
+      <div class="menu-buttons">
+        <button id="btn-resume" class="menu-btn primary">RESUME</button>
+        <button id="btn-restart-pause" class="menu-btn">RESTART</button>
+        <button id="btn-credits-pause" class="menu-btn">CREDITS</button>
+        <button id="btn-toggle-sound" class="menu-btn">AUDIO: ON</button>
+        <button id="btn-quit" class="menu-btn">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Over Screen -->
+  <div id="game-over-screen" class="modal-screen jumpscare hidden">
+    <div class="modal-box horror-box">
+      <h1 class="blood-title">YOU WERE CONSUMED</h1>
+      <p class="horror-sub">THE ENTITY CLAIMED YOU IN THE FOG</p>
+      <div class="menu-buttons">
+        <button id="btn-retry" class="menu-btn primary">TRY AGAIN</button>
+        <button id="btn-gameover-menu" class="menu-btn">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Victory Screen -->
+  <div id="victory-screen" class="modal-screen victory hidden">
+    <div class="modal-box victory-box">
+      <h1 class="victory-title">YOU ESCAPED</h1>
+      <p class="victory-sub">THE BEACONS GUIDED YOU OUT OF THE VOID</p>
+      <div class="victory-stats">
+        <p>TIME SURVIVED: <span id="stat-time">0:00</span></p>
+        <p>BEACONS ACTIVATED: <span>4 / 4</span></p>
+      </div>
+      <div class="menu-buttons">
+        <button id="btn-play-again" class="menu-btn primary">PLAY AGAIN</button>
+        <button id="btn-victory-menu" class="menu-btn">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Game Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/joystick.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/entity.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
