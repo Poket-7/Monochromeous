@@ -481,7 +481,7 @@ class Game {
           if (this.activatedBeacons >= this.totalBeacons) {
             this.exitUnlocked = true;
             this.map.unlockExit();
-            prompt.textContent = "⚡ ALL BEACONS RESTORED! BLAST GATE UNLOCKED ⚡";
+            prompt.textContent = "[!] ALL BEACONS RESTORED! BLAST GATE UNLOCKED [!]";
             setTimeout(() => {
               prompt.textContent = "[TAP / PRESS E TO ACTIVATE BEACON]";
             }, 3500);

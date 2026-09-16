@@ -67,18 +67,16 @@ A pre-built, signed, and aligned APK is available directly in this repository:
 
 ---
 
-## 🌐 Playing in Web Browser
+## 🖥️ Playing on PC / Web Browser
 
-You can play immediately without any web server:
-1. Clone this repository:
-   ```bash
-   git clone https://github.com/Poket-7/Monochromeous.git
-   ```
-2. Double-click `index.html` or run a local HTTP server:
+You can play immediately on PC:
+1. **Windows 1-Click**: Double-click **`Play-PC.bat`** to instantly launch the game in your default browser.
+2. **Direct Browser**: Open **`index.html`** directly in Chrome, Edge, Firefox, or any modern web browser.
+3. **Optional Local HTTP Server**:
    ```bash
    python -m http.server 8080
    ```
-3. Open `http://localhost:8080` in your web browser.
+   and navigate to `http://localhost:8080`.
 
 ---
 

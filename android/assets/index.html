@@ -1,17 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>MONOCHROMEOUS // SURVIVAL HORROR</title>
-  <link rel="stylesheet" href="style.css">
-  <!-- Local Three.js with CDN fallback -->
+  <link rel="stylesheet" href="style.css" />
+  <!-- Three.js Engine -->
   <script src="js/three.min.js"></script>
-  <script>
-    if (typeof THREE === 'undefined') {
-      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"><\/script>');
-    }
-  </script>
 </head>
 <body>
   <!-- Canvas Container for Low-Resolution Pixelated 3D Render -->
@@ -41,13 +37,13 @@
           <div id="stamina-bar" style="width: 100%;"></div>
         </div>
       </div>
-      <button id="btn-pause" class="hud-btn" aria-label="Pause Game">❚❚</button>
+      <button id="btn-pause" class="hud-btn" aria-label="Pause Game">&#10074;&#10074;</button>
     </div>
 
     <!-- Proximity Alert & Threat Detection -->
     <div id="threat-indicator" class="hidden">
       <div class="threat-pulse"></div>
-      <span class="threat-text">⚠ ENTITY DETECTED ⚠</span>
+      <span class="threat-text">&#9888; ENTITY DETECTED &#9888;</span>
     </div>
 
     <div id="interaction-prompt" class="interaction-prompt hidden">
@@ -95,7 +91,7 @@
         <button id="btn-credits" class="menu-btn">CREDITS</button>
       </div>
       
-      <div class="footer-note">Controls: Left Joystick to move • Right side to look • Keyboard WASD + Mouse</div>
+      <div class="footer-note">Controls: Left Joystick to move &bull; Right side to look &bull; Keyboard WASD + Mouse</div>
     </div>
   </div>
 
@@ -134,17 +130,17 @@
           <div>
             <h3>TOUCH CONTROLS:</h3>
             <ul>
-              <li><strong>Left Joystick:</strong> Visible joystick to walk & strafe</li>
+              <li><strong>Left Joystick:</strong> Visible joystick to walk &amp; strafe</li>
               <li><strong>Right Screen Area:</strong> Drag to rotate camera view</li>
               <li><strong>LIGHT:</strong> Toggle Flashlight</li>
               <li><strong>SPRINT:</strong> Hold to sprint</li>
-              <li><strong>Pause Button (❚❚):</strong> Top-right corner</li>
+              <li><strong>Pause Button (&#10074;&#10074;):</strong> Top-right corner</li>
             </ul>
           </div>
           <div>
             <h3>DESKTOP CONTROLS:</h3>
             <ul>
-              <li><strong>W, A, S, D / Arrows:</strong> Move & Strafe</li>
+              <li><strong>W, A, S, D / Arrows:</strong> Move &amp; Strafe</li>
               <li><strong>Mouse:</strong> Look around (Click to lock cursor)</li>
               <li><strong>Shift:</strong> Sprint</li>
               <li><strong>F:</strong> Toggle Flashlight</li>
@@ -153,7 +149,7 @@
             </ul>
           </div>
         </div>
-        <p class="warning-text">⚠ The Entity hunts in the fog. Watch your proximity alert and listen for accelerating heartbeats.</p>
+        <p class="warning-text">&#9888; The Entity hunts in the fog. Watch your proximity alert and listen for accelerating heartbeats.</p>
       </div>
       <button id="btn-close-instructions" class="menu-btn">RETURN</button>
     </div>
