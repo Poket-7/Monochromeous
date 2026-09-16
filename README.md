@@ -71,7 +71,7 @@ A pre-built, signed, and aligned APK is available directly in this repository:
 
 You can play immediately on PC:
 1. **Windows 1-Click**: Double-click **`Play-PC.bat`** to instantly launch the game in your default browser.
-2. **Direct Browser**: Open **`index.html`** directly in Chrome, Edge, Firefox, or any modern web browser.
+2. **Direct Browser**: Open **`index.html`** directly in Chrome, Edge, Firefox, or any modern web browser. **`index.html` is completely self-contained** (all styles, Three.js 3D engine, sounds, and game logic are embedded), so it runs anywhere without needing external files or internet.
 3. **Optional Local HTTP Server**:
    ```bash
    python -m http.server 8080
