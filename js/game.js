@@ -62,7 +62,7 @@ class Game {
     this.scene.background = new THREE.Color(0x000000);
 
     // Thick atmospheric monochrome fog
-    this.scene.fog = new THREE.FogExp2(0x000000, 0.07);
+    this.scene.fog = new THREE.FogExp2(0x000000, 0.035);
 
     // Camera
     this.camera = new THREE.PerspectiveCamera(65, 16 / 9, 0.1, 100);
@@ -83,21 +83,26 @@ class Game {
     }
     this.renderer.toneMapping = THREE.NoToneMapping;
 
-    // Very faint monochrome ambient light
-    const ambientLight = new THREE.AmbientLight(0x161616);
+    // Faint monochrome ambient light (balanced so silhouettes and geometry are visible)
+    const ambientLight = new THREE.AmbientLight(0x484848, 1.0);
     this.scene.add(ambientLight);
 
-    // Player Flashlight (Focused monochrome beam)
-    this.flashlight = new THREE.SpotLight(0xffffff, 4.5, 34, Math.PI / 5.2, 0.4, 1.3);
-    this.flashlight.position.copy(this.camera.position);
+    // Player Flashlight (Focused monochrome beam attached directly to camera)
+    this.flashlight = new THREE.SpotLight(0xffffff, 8.0, 50, Math.PI / 4.2, 0.5, 0.8);
+    this.flashlight.position.set(0, 0, 0);
     this.flashlightTarget = new THREE.Object3D();
-    this.scene.add(this.flashlightTarget);
+    this.flashlightTarget.position.set(0, 0, -10);
     this.flashlight.target = this.flashlightTarget;
-    this.scene.add(this.flashlight);
+
+    this.camera.add(this.flashlight);
+    this.camera.add(this.flashlightTarget);
 
     // Flashlight bulb ambient halo
-    this.flashlightGlow = new THREE.PointLight(0xffffff, 0.8, 4);
-    this.scene.add(this.flashlightGlow);
+    this.flashlightGlow = new THREE.PointLight(0xffffff, 1.2, 7);
+    this.flashlightGlow.position.set(0, 0, 0);
+    this.camera.add(this.flashlightGlow);
+
+    this.scene.add(this.camera);
 
     // Build World Map
     this.map = new WorldMap(this.scene);
@@ -120,44 +125,24 @@ class Game {
   }
 
   bindUIEvents() {
-    // Fast, reliable tap and click dispatcher for mobile and desktop
+    // Fast, rock-solid tap and click dispatcher for mobile, touchscreens, and desktop
     const addTap = (id, handler) => {
       const el = document.getElementById(id);
       if (!el) return;
-      let touchStart = 0;
-      let startX = 0, startY = 0;
-      let moved = false;
-
-      el.addEventListener('touchstart', (e) => {
-        touchStart = performance.now();
-        moved = false;
-        if (e.touches && e.touches.length > 0) {
-          startX = e.touches[0].clientX;
-          startY = e.touches[0].clientY;
-        }
-      }, { passive: true });
-
-      el.addEventListener('touchmove', (e) => {
-        if (e.touches && e.touches.length > 0) {
-          const dx = Math.abs(e.touches[0].clientX - startX);
-          const dy = Math.abs(e.touches[0].clientY - startY);
-          if (dx > 15 || dy > 15) {
-            moved = true;
-          }
-        }
-      }, { passive: true });
+      let handledViaTouch = false;
 
       el.addEventListener('touchend', (e) => {
-        if (!moved && (performance.now() - touchStart < 650)) {
-          e.preventDefault();
-          handler(e);
-        }
-      });
+        e.preventDefault();
+        e.stopPropagation();
+        handledViaTouch = true;
+        setTimeout(() => { handledViaTouch = false; }, 400);
+        handler(e);
+      }, { passive: false });
 
       el.addEventListener('click', (e) => {
-        if (performance.now() - touchStart > 650) {
-          handler(e);
-        }
+        if (handledViaTouch) return;
+        e.stopPropagation();
+        handler(e);
       });
     };
 
@@ -253,9 +238,9 @@ class Game {
       this.map.exitLight.intensity = 1.5;
     }
 
-    // Reset Player
+    // Reset Player (spawn facing down hallway)
     this.playerPos.set(this.map.playerSpawn.x, 1.6, this.map.playerSpawn.z);
-    this.cameraYaw = 0;
+    this.cameraYaw = -Math.PI / 2;
     this.cameraPitch = 0;
 
     // Reset Entity
@@ -369,8 +354,8 @@ class Game {
       flickerFactor = 0.2;
     }
 
-    this.flashlight.intensity = this.isFlashlightOn ? 4.5 * flickerFactor : 0;
-    this.flashlightGlow.intensity = this.isFlashlightOn ? 0.8 * flickerFactor : 0;
+    this.flashlight.intensity = this.isFlashlightOn ? 8.0 * flickerFactor : 0;
+    this.flashlightGlow.intensity = this.isFlashlightOn ? 1.2 * flickerFactor : 0;
 
     // 3. Movement
     const move = input.getMovement();
@@ -434,13 +419,6 @@ class Game {
     euler.x = this.cameraPitch;
     euler.y = this.cameraYaw;
     this.camera.quaternion.setFromEuler(euler);
-
-    // Update Flashlight orientation
-    this.flashlight.position.copy(this.playerPos);
-    this.flashlightGlow.position.copy(this.playerPos);
-
-    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(this.camera.quaternion);
-    this.flashlightTarget.position.copy(this.playerPos).add(dir.multiplyScalar(10));
 
     // 4. Beacon & Exit Gate Interaction
     this.checkBeaconInteraction(input);
@@ -525,6 +503,10 @@ class Game {
 }
 
 // Instantiate game on load
-window.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+  window.addEventListener('DOMContentLoaded', () => {
+    window.game = new Game();
+  });
+} else {
   window.game = new Game();
-});
+}

@@ -56,12 +56,12 @@ class WorldMap {
     wallCanvas.width = 128;
     wallCanvas.height = 128;
     const wctx = wallCanvas.getContext('2d');
-    wctx.fillStyle = '#161616';
+    wctx.fillStyle = '#8e8e8e';
     wctx.fillRect(0, 0, 128, 128);
 
     // Brick mortar lines
-    wctx.strokeStyle = '#050505';
-    wctx.lineWidth = 2;
+    wctx.strokeStyle = '#181818';
+    wctx.lineWidth = 2.5;
     for (let y = 0; y < 128; y += 16) {
       wctx.beginPath();
       wctx.moveTo(0, y);
@@ -80,7 +80,7 @@ class WorldMap {
     // High contrast monochrome noise & grit
     const imgData = wctx.getImageData(0, 0, 128, 128);
     for (let i = 0; i < imgData.data.length; i += 4) {
-      const noise = (Math.random() - 0.5) * 60;
+      const noise = (Math.random() - 0.5) * 55;
       const val = Math.min(255, Math.max(0, imgData.data[i] + noise));
       imgData.data[i] = val;
       imgData.data[i + 1] = val;
@@ -99,11 +99,11 @@ class WorldMap {
     floorCanvas.width = 128;
     floorCanvas.height = 128;
     const fctx = floorCanvas.getContext('2d');
-    fctx.fillStyle = '#0a0a0a';
+    fctx.fillStyle = '#606060';
     fctx.fillRect(0, 0, 128, 128);
 
     // Tiles
-    fctx.strokeStyle = '#222222';
+    fctx.strokeStyle = '#161616';
     fctx.lineWidth = 2;
     fctx.strokeRect(2, 2, 60, 60);
     fctx.strokeRect(66, 2, 60, 60);
@@ -112,7 +112,7 @@ class WorldMap {
 
     const fData = fctx.getImageData(0, 0, 128, 128);
     for (let i = 0; i < fData.data.length; i += 4) {
-      const n = (Math.random() - 0.5) * 35;
+      const n = (Math.random() - 0.5) * 45;
       const val = Math.min(255, Math.max(0, fData.data[i] + n));
       fData.data[i] = val;
       fData.data[i + 1] = val;
@@ -128,12 +128,12 @@ class WorldMap {
     floorTex.repeat.set(16, 16);
 
     return {
-      wall: new THREE.MeshLambertMaterial({ map: wallTex, color: 0x999999 }),
-      floor: new THREE.MeshLambertMaterial({ map: floorTex, color: 0x777777 }),
-      ceiling: new THREE.MeshLambertMaterial({ color: 0x111111 }),
-      beaconOff: new THREE.MeshLambertMaterial({ color: 0x444444, wireframe: true }),
+      wall: new THREE.MeshLambertMaterial({ map: wallTex, color: 0xffffff }),
+      floor: new THREE.MeshLambertMaterial({ map: floorTex, color: 0xdddddd }),
+      ceiling: new THREE.MeshLambertMaterial({ color: 0x303030 }),
+      beaconOff: new THREE.MeshLambertMaterial({ color: 0x555555, wireframe: true }),
       beaconOn: new THREE.MeshBasicMaterial({ color: 0xffffff, wireframe: false }),
-      exitLocked: new THREE.MeshLambertMaterial({ color: 0x222222 }),
+      exitLocked: new THREE.MeshLambertMaterial({ color: 0x333333 }),
       exitUnlocked: new THREE.MeshBasicMaterial({ color: 0xffffff })
     };
   }

@@ -79,7 +79,7 @@ button, .menu-btn, .action-btn, .hud-btn {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  background: radial-gradient(circle, transparent 40%, rgba(0, 0, 0, 0.8) 85%, #000000 100%);
+  background: radial-gradient(circle, transparent 55%, rgba(0, 0, 0, 0.35) 85%, rgba(0, 0, 0, 0.75) 100%);
   z-index: 11;
 }
 
@@ -124,7 +124,7 @@ button, .menu-btn, .action-btn, .hud-btn {
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 20;
+  z-index: 40;
 }
 
 .hud-top {
@@ -138,6 +138,8 @@ button, .menu-btn, .action-btn, .hud-btn {
   background: rgba(0, 0, 0, 0.65);
   border: 1px solid #ffffff;
   padding: 10px 16px;
+  pointer-events: auto;
+  z-index: 41;
 }
 
 .hud-objective {
@@ -175,17 +177,24 @@ button, .menu-btn, .action-btn, .hud-btn {
 }
 
 .hud-btn {
-  pointer-events: auto;
+  pointer-events: auto !important;
   margin-left: auto;
   background: #000000;
   border: 2px solid #ffffff;
   color: #ffffff;
   font-size: 16px;
   font-weight: bold;
-  padding: 4px 14px;
+  padding: 6px 16px;
   cursor: pointer;
   outline: none;
+  position: relative;
+  z-index: 45;
   transition: all 0.1s ease;
+  min-width: 44px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .hud-btn:hover, .hud-btn:active {
@@ -321,10 +330,10 @@ button, .menu-btn, .action-btn, .hud-btn {
 /* Right Touch Drag Area (for Camera Rotation) */
 #look-zone {
   position: absolute;
-  top: 0;
+  top: 75px;
   right: 0;
   width: 55vw;
-  height: 100vh;
+  height: calc(100vh - 75px);
   pointer-events: auto;
   display: flex;
   align-items: center;
@@ -383,7 +392,7 @@ button, .menu-btn, .action-btn, .hud-btn {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.92);
+  background: rgba(0, 0, 0, 0.78);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -707,6 +716,11 @@ button, .menu-btn, .action-btn, .hud-btn {
     bottom: 15px;
     right: 12px;
     gap: 8px;
+  }
+
+  #look-zone {
+    top: 55px;
+    height: calc(100vh - 55px);
   }
 
   .action-btn {
